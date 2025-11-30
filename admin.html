@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스코어보드 관리자</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f0f2f5;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                max-width: 600px;
+                padding: 24px;
+            }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            color: #202124;
+            margin: 0;
+            flex: 1;
+        }
+
+        .reset-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .reset-button:hover {
+            background: #b91c1c;
+        }
+
+        .mode-section {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mode-button {
+            padding: 12px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-button.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        .point-system-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .point-button {
+            padding: 10px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .point-button.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .team-section {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .set-section {
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #e8f0fe;
+            border-radius: 8px;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .set-section.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .set-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .set-button {
+            flex: 1;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .set-button.active {
+            background: #1557b0;
+        }
+
+        .set-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a73e8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-set-marker {
+            font-size: 0.75rem;
+            background: #1a73e8;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .score-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .score-control label {
+            min-width: 80px;
+            font-size: 0.875rem;
+            color: #5f6368;
+        }
+
+        .score-display {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .score-button {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #5f6368;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .team-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .mode-label {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/javascript">
+        const ScoreboardAdmin = () => {
+            const initialState = {
+                mode: '3set', // '3set' or 'single'
+                pointSystem: 15, // 15, 17, or 21 for single set mode
+                setCount: 1,
+                scores: {
+                    team1: [0, 0, 0],
+                    team2: [0, 0, 0]
+                },
+                teamNames: {
+                    team1: '팀 1',
+                    team2: '팀 2'
+                },
+                currentSet: 0
+            };
+
+            const [state, setState] = React.useState(initialState);
+
+            React.useEffect(() => {
+                const loadState = () => {
+                    const savedState = localStorage.getItem('scoreboard-state');
+                    if (savedState) {
+                        try {
+                            const parsedState = JSON.parse(savedState);
+                            setState(prev => ({
+                                ...prev,
+                                ...parsedState
+                            }));
+                        } catch (error) {
+                            console.error('상태 로드 중 오류 발생:', error);
+                        }
+                    }
+                };
+
+                loadState();
+                const interval = setInterval(loadState, 1000);
+                return () => clearInterval(interval);
+            }, []);
+
+            const saveState = (newState) => {
+                localStorage.setItem('scoreboard-state', JSON.stringify(newState));
+            };
+
+            const handleReset = () => {
+                const resetState = {
+                    ...initialState,
+                    mode: state.mode,
+                    pointSystem: state.pointSystem
+                };
+                setState(resetState);
+                saveState(resetState);
+            };
+
+            const handleModeChange = (mode) => {
+                const newState = {
+                    ...state,
+                    mode: mode,
+                    currentSet: 0,
+                    setCount: 1,
+                    scores: {
+                        team1: [0, 0, 0],
+                        team2: [0, 0, 0]
+                    }
+                };
+                setState(newState);
+                saveState(newState);
+            };
+
+            const handlePointSystemChange = (points) => {
+                const newState = {
+                    ...state,
+                    pointSystem: points
+                };
+                setState(newState);
+                saveState(newState);
+            };
+
+            const handleTeamNameChange = (team, name) => {
+                const newState = {
+                    ...state,
+                    teamNames: {
+                        ...state.teamNames,
+                        [team]: name
+                    }
+                };
+                setState(newState);
+                saveState(newState);
+            };
+
+            const handleScoreChange = (team, delta) => {
+                const newState = {
+                    ...state,
+                    scores: {
+                        ...state.scores,
+                        [team]: state.scores[team].map((score, index) =>
+                            index === state.currentSet ? Math.max(0, score + delta) : score
+                        )
+                    }
+                };
+                setState(newState);
+                saveState(newState);
+            };
+
+            const handleSetChange = (newSet) => {
+                const newState = {
+                    ...state,
+                    setCount: Math.max(newSet + 1, state.setCount),
+                    currentSet: newSet
+                };
+                setState(newState);
+                saveState(newState);
+            };
+
+            return React.createElement('div', { className: 'container' }, [
+                React.createElement('div', { 
+                    key: 'header',
+                    className: 'header'
+                }, [
+                    React.createElement('h2', { 
+                        key: 'title'
+                    }, '스코어보드 관리'),
+                    React.createElement('button', {
+                        key: 'reset-button',
+                        className: 'reset-button',
+                        onClick: handleReset
+                    }, '리셋')
+                ]),
+
+                React.createElement('div', {
+                    key: 'mode-section',
+                    className: 'mode-section'
+                }, [
+                    React.createElement('div', {
+                        key: 'mode-label',
+                        className: 'mode-label'
+                    }, '경기 모드'),
+                    React.createElement('div', {
+                        key: 'mode-selector',
+                        className: 'mode-selector'
+                    }, [
+                        React.createElement('button', {
+                            key: 'mode-3set',
+                            className: `mode-button ${state.mode === '3set' ? 'active' : ''}`,
+                            onClick: () => handleModeChange('3set')
+                        }, '3세트'),
+                        React.createElement('button', {
+                            key: 'mode-single',
+                            className: `mode-button ${state.mode === 'single' ? 'active' : ''}`,
+                            onClick: () => handleModeChange('single')
+                        }, '단세트')
+                    ]),
+                    state.mode === 'single' && React.createElement('div', {
+                        key: 'point-system'
+                    }, [
+                        React.createElement('div', {
+                            key: 'point-label',
+                            className: 'mode-label',
+                            style: { marginTop: '12px' }
+                        }, '점수 제도'),
+                        React.createElement('div', {
+                            key: 'point-selector',
+                            className: 'point-system-selector'
+                        }, [15, 17, 21].map(points =>
+                            React.createElement('button', {
+                                key: `point-${points}`,
+                                className: `point-button ${state.pointSystem === points ? 'active' : ''}`,
+                                onClick: () => handlePointSystemChange(points)
+                            }, `${points}점제`)
+                        ))
+                    ])
+                ]),
+                
+                React.createElement('div', { 
+                    key: 'team-names',
+                    className: 'team-section'
+                }, [
+                    React.createElement('div', { key: 'team1-name' }, [
+                        React.createElement('label', { key: 'team1-label' }, '팀 1 이름'),
+                        React.createElement('input', {
+                            key: 'team1-input',
+                            type: 'text',
+                            value: state.teamNames.team1,
+                            onChange: (e) => handleTeamNameChange('team1', e.target.value),
+                            placeholder: '팀 1 이름'
+                        })
+                    ]),
+                    React.createElement('div', { key: 'team2-name' }, [
+                        React.createElement('label', { key: 'team2-label' }, '팀 2 이름'),
+                        React.createElement('input', {
+                            key: 'team2-input',
+                            type: 'text',
+                            value: state.teamNames.team2,
+                            onChange: (e) => handleTeamNameChange('team2', e.target.value),
+                            placeholder: '팀 2 이름'
+                        })
+                    ])
+                ]),
+
+                state.mode === '3set' && React.createElement('div', { 
+                    key: 'set-controls',
+                    className: 'set-controls'
+                }, [1, 2, 3].map(setNum => 
+                    React.createElement('button', {
+                        key: `set-${setNum}`,
+                        className: `set-button ${state.currentSet === setNum - 1 ? 'active' : ''}`,
+                        onClick: () => handleSetChange(setNum - 1)
+                    }, `${setNum}세트`)
+                )),
+
+                ...(state.mode === 'single' ? [0] : [0, 1, 2]).map(setIndex => 
+                    React.createElement('div', {
+                        key: `set-${setIndex}`,
+                        className: `set-section ${setIndex < state.setCount ? 'active' : ''}`
+                    }, [
+                        React.createElement('div', { 
+                            key: `set-title-${setIndex}`,
+                            className: 'set-title'
+                        }, [
+                            state.mode === 'single' 
+                                ? `단세트 (${state.pointSystem}점제)`
+                                : `${setIndex + 1}세트`,
+                            (state.mode === '3set' && state.currentSet === setIndex) && 
+                                React.createElement('span', { 
+                                    key: `current-set-marker-${setIndex}`,
+                                    className: 'current-set-marker'
+                                }, '현재 세트')
+                        ]),
+                        React.createElement('div', { 
+                            key: `team-scores-${setIndex}`,
+                            className: 'team-scores' 
+                        }, [
+                            React.createElement('div', { 
+                                key: `team1-set${setIndex}`,
+                                className: 'score-control'
+                            }, [
+                                React.createElement('label', { 
+                                    key: `team1-label-${setIndex}` 
+                                }, `${state.teamNames.team1}`),
+                                React.createElement('button', {
+                                    key: `team1-minus-${setIndex}`,
+                                    onClick: () => handleScoreChange('team1', -1),
+                                    className: 'score-button'
+                                }, '-'),
+                                React.createElement('div', { 
+                                    key: `team1-score-${setIndex}`,
+                                    className: 'score-display' 
+                                }, state.scores.team1[setIndex]),
+                                React.createElement('button', {
+                                    key: `team1-plus-${setIndex}`,
+                                    onClick: () => handleScoreChange('team1', 1),
+                                    className: 'score-button'
+                                }, '+')
+                            ]),
+                            React.createElement('div', { 
+                                key: `team2-set${setIndex}`,
+                                className: 'score-control'
+                            }, [
+                                React.createElement('label', { 
+                                    key: `team2-label-${setIndex}` 
+                                }, `${state.teamNames.team2}`),
+                                React.createElement('button', {
+                                    key: `team2-minus-${setIndex}`,
+                                    onClick: () => handleScoreChange('team2', -1),
+                                    className: 'score-button'
+                                }, '-'),
+                                React.createElement('div', { 
+                                    key: `team2-score-${setIndex}`,
+                                    className: 'score-display' 
+                                }, state.scores.team2[setIndex]),
+                                React.createElement('button', {
+                                    key: `team2-plus-${setIndex}`,
+                                    onClick: () => handleScoreChange('team2', 1),
+                                    className: 'score-button'
+                                }, '+')
+                            ])
+                        ])
+                    ])
+                )
+            ]);
+        };
+
+        ReactDOM.render(
+            React.createElement(ScoreboardAdmin),
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
