@@ -271,8 +271,8 @@
         
         const ScoreboardAdmin = () => {
             const initialState = {
-                mode: '3set', // '3set' or 'single'
-                pointSystem: 15, // 15, 17, or 21 for single set mode
+                mode: '3set',
+                pointSystem: 15,
                 setCount: 1,
                 scores: {
                     team1: [0, 0, 0],
@@ -308,35 +308,42 @@
                 return () => clearInterval(interval);
             }, []);
 
-            const GOOGLE_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE'; // 여기에 Apps Script URL 입력
-
             const saveState = (newState) => {
                 localStorage.setItem('scoreboard-state', JSON.stringify(newState));
                 
-                // 구글 시트에도 저장
                 const designSettings = localStorage.getItem('scoreboard-design');
+                
+                const payload = {
+                    team1Name: newState.teamNames.team1,
+                    team2Name: newState.teamNames.team2,
+                    mode: newState.mode,
+                    currentSet: newState.currentSet,
+                    team1Score1: newState.scores.team1[0],
+                    team1Score2: newState.scores.team1[1],
+                    team1Score3: newState.scores.team1[2],
+                    team2Score1: newState.scores.team2[0],
+                    team2Score2: newState.scores.team2[1],
+                    team2Score3: newState.scores.team2[2],
+                    pointSystem: newState.pointSystem,
+                    designSettings: designSettings
+                };
+                
+                console.log('구글 시트로 전송할 데이터:', payload);
                 
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        team1Name: newState.teamNames.team1,
-                        team2Name: newState.teamNames.team2,
-                        mode: newState.mode,
-                        currentSet: newState.currentSet,
-                        team1Score1: newState.scores.team1[0],
-                        team1Score2: newState.scores.team1[1],
-                        team1Score3: newState.scores.team1[2],
-                        team2Score1: newState.scores.team2[0],
-                        team2Score2: newState.scores.team2[1],
-                        team2Score3: newState.scores.team2[2],
-                        pointSystem: newState.pointSystem,
-                        designSettings: designSettings
-                    })
-                }).catch(err => console.error('구글 시트 저장 오류:', err));
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('구글 시트 응답:', data);
+                })
+                .catch(err => {
+                    console.error('구글 시트 저장 오류:', err);
+                });
             };
 
             const handleReset = () => {
