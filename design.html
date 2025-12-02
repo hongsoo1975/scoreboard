@@ -32,438 +32,445 @@
         }
 
         h2 {
-            font-size: 1.5rem;
-            color: #202124;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            color: #1e40af;
         }
 
-        .section {
-            margin-bottom: 32px;
-            padding: 20px;
-            background: #f8f9fa;
+        .section-group {
+            border: 1px solid #ddd;
+            padding: 15px;
             border-radius: 8px;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a73e8;
-            margin-bottom: 16px;
-        }
-
-        .control-group {
             margin-bottom: 20px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #5f6368;
+        .section-group h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
             font-weight: 500;
-            font-size: 0.875rem;
+            margin-bottom: 5px;
+            color: #555;
         }
 
-        input[type="color"] {
-            width: 100%;
-            height: 50px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        input[type="number"],
-        input[type="range"],
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+        input[type="color"], input[type="text"], select, input[type="range"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             font-size: 16px;
         }
 
+        input[type="color"] {
+            height: 35px;
+            width: 100px;
+            cursor: pointer;
+        }
+
         input[type="range"] {
-            padding: 0;
+            width: 100%;
+            cursor: pointer;
         }
 
-        .range-value {
-            display: inline-block;
-            margin-left: 12px;
-            font-weight: 600;
-            color: #1a73e8;
-        }
-
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+        .color-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .button-group {
+            margin-top: 30px;
             display: flex;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
         }
 
-        button {
-            flex: 1;
-            padding: 12px 24px;
+        .save-button, .reset-button {
+            padding: 10px 20px;
             border: none;
             border-radius: 6px;
-            font-weight: 600;
-            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 700;
+            transition: background-color 0.2s;
         }
 
         .save-button {
-            background: #1a73e8;
+            background-color: #1e40af;
             color: white;
         }
 
         .save-button:hover {
-            background: #1557b0;
+            background-color: #1d4ed8;
         }
 
         .reset-button {
-            background: #dc2626;
-            color: white;
+            background-color: #fca5a5;
+            color: #991b1b;
         }
 
         .reset-button:hover {
-            background: #b91c1c;
-        }
-
-        .preview {
-            margin-top: 24px;
-            padding: 20px;
-            background: #e8f0fe;
-            border-radius: 8px;
-        }
-
-        .preview-title {
-            font-size: 0.875rem;
-            color: #5f6368;
-            margin-bottom: 12px;
-        }
-
-        .font-controls {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 12px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+            background-color: #f87171;
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
-    <script type="text/javascript">
+
+    <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySEAl2UC3nulSGi2l5-6RuqdWQ6ke9Y2VXyl-bo3XxNzOrrEgmwMcj09iNbbfg-88L/exec';
-        
+
+        const { useState, useEffect, useCallback } = React;
+        const rootElement = document.getElementById('root');
+
+        const FONT_OPTIONS = [
+            { name: 'Noto Sans KR', value: 'Noto Sans KR' },
+            { name: 'Black Han Sans', value: 'Black Han Sans' },
+            { name: 'Do Hyeon', value: 'Do Hyeon' },
+            { name: 'Jua', value: 'Jua' }
+        ];
+
+        const defaultSettings = {
+            colors: {
+                teamNameBg: '#1e3a8a',
+                scoreBg: '#2563eb',
+                currentSetHighlight: '#3b82f6',
+                textColor: '#ffffff',
+                borderColor: 'rgba(30, 58, 138, 0.8)'
+            },
+            font: {
+                family: 'Noto Sans KR',
+                weight: 700,
+                italic: false,
+                teamNameSize: 24,
+                scoreSize: 32
+            },
+            style: {
+                borderRadius: 12,
+                borderWidth: 2,
+                opacity: 100,
+                shadowIntensity: 4
+            }
+        };
+
         const DesignSettings = () => {
-            const defaultSettings = {
-                colors: {
-                    teamNameBg: '#1e40af',
-                    scoreBg: '#2563eb',
-                    currentSetHighlight: '#3b82f6',
-                    textColor: '#ffffff',
-                    borderColor: '#1e3a8a'
-                },
-                font: {
-                    family: 'Noto Sans KR',
-                    weight: '400',
-                    italic: false,
-                    teamNameSize: 18,
-                    scoreSize: 24
-                },
-                style: {
-                    borderWidth: 1,
-                    borderRadius: 8,
-                    opacity: 95,
-                    shadowIntensity: 4
-                }
-            };
+            const [settings, setSettings] = useState(defaultSettings);
+            const [loading, setLoading] = useState(true);
 
-            const [settings, setSettings] = React.useState(defaultSettings);
-
-            React.useEffect(() => {
-                // 구글 시트에서 디자인 설정 로드
+            // Google Sheet에서 현재 설정 불러오기
+            useEffect(() => {
                 fetch(GOOGLE_SCRIPT_URL)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.status === 'success') {
-                            const rows = result.data;
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success' && data.data && data.data[0] && data.data[0][6]) {
                             try {
-                                const settingsJson = rows[1][6]; // G열
-                                if (settingsJson && settingsJson !== '{...}') {
-                                    const loadedSettings = JSON.parse(settingsJson);
-                                    setSettings(loadedSettings);
-                                    localStorage.setItem('scoreboard-design', settingsJson);
-                                }
+                                const savedSettings = JSON.parse(data.data[0][6]);
+                                // 기본 설정과 병합하여 누락된 키 방지
+                                setSettings(prev => ({
+                                    colors: { ...prev.colors, ...savedSettings.colors },
+                                    font: { ...prev.font, ...savedSettings.font },
+                                    style: { ...prev.style, ...savedSettings.style },
+                                }));
                             } catch (e) {
-                                console.error('설정 로드 실패:', e);
+                                console.error('저장된 JSON 파싱 오류:', e);
+                                alert('경고: 저장된 디자인 설정 불러오기에 실패했습니다. 기본 설정으로 시작합니다.');
+                                setSettings(defaultSettings);
                             }
+                        } else {
+                            // 시트에 설정이 없는 경우
+                            setSettings(defaultSettings);
                         }
                     })
                     .catch(err => {
-                        console.error('구글 시트 로드 오류:', err);
-                        // 로컬스토리지에서 로드
-                        const saved = localStorage.getItem('scoreboard-design');
-                        if (saved) {
-                            try {
-                                setSettings(JSON.parse(saved));
-                            } catch (e) {
-                                console.error('로컬 설정 로드 실패:', e);
-                            }
-                        }
-                    });
+                        console.error('설정 로드 중 오류 발생:', err);
+                        alert('설정 로드 실패 (네트워크 또는 CORS 오류). 기본 설정으로 시작합니다.');
+                        setSettings(defaultSettings);
+                    })
+                    .finally(() => setLoading(false));
             }, []);
 
-            const updateColor = (key, value) => {
-                const newSettings = {
-                    ...settings,
-                    colors: { ...settings.colors, [key]: value }
-                };
-                setSettings(newSettings);
-            };
+            // 색상 업데이트
+            const updateColor = useCallback((key, value) => {
+                setSettings(prev => ({
+                    ...prev,
+                    colors: { ...prev.colors, [key]: value }
+                }));
+            }, []);
 
-            const updateFont = (key, value) => {
-                const newSettings = {
-                    ...settings,
-                    font: { ...settings.font, [key]: value }
-                };
-                setSettings(newSettings);
-            };
+            // 폰트 업데이트
+            const updateFont = useCallback((key, value) => {
+                setSettings(prev => ({
+                    ...prev,
+                    font: { ...prev.font, [key]: value }
+                }));
+            }, []);
 
-            const updateStyle = (key, value) => {
-                const newSettings = {
-                    ...settings,
-                    style: { ...settings.style, [key]: value }
-                };
-                setSettings(newSettings);
-            };
+            // 스타일 업데이트
+            const updateStyle = useCallback((key, value) => {
+                setSettings(prev => ({
+                    ...prev,
+                    style: { ...prev.style, [key]: value }
+                }));
+            }, []);
 
-            const handleSave = () => {
-                localStorage.setItem('scoreboard-design', JSON.stringify(settings));
+            // Google Sheet에 디자인 설정 저장
+            const handleSave = useCallback(() => {
+                setLoading(true);
                 
-                // 구글 시트에도 저장
+                // 로컬 저장소 메시지를 제거하여 혼동 방지
+                
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify({
-                        designSettings: JSON.stringify(settings)
-                    })
-                }).then(() => {
-                    alert('디자인 설정이 저장되었습니다!');
-                }).catch(err => {
-                    console.error('구글 시트 저장 오류:', err);
-                    alert('디자인 설정이 로컬에 저장되었습니다.');
-                });
-            };
+                    // Google Apps Script는 POST 데이터를 postData.contents로 받습니다.
+                    body: JSON.stringify({ designSettings: JSON.stringify(settings) })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        alert('✅ 디자인 설정이 Google Sheet에 저장되었습니다! 스코어보드에 반영됩니다.');
+                    } else {
+                        alert('❌ 저장 실패: Google Script 오류가 발생했습니다. (콘솔 확인)');
+                        console.error('Google Script 저장 오류:', result.message);
+                    }
+                })
+                .catch(error => {
+                    alert('❌ 저장 실패: 네트워크 또는 CORS 오류가 발생했습니다. (콘솔 확인)');
+                    console.error('Fetch 저장 오류:', error);
+                })
+                .finally(() => setLoading(false));
+            }, [settings]);
 
-            const handleReset = () => {
-                if (confirm('모든 설정을 초기화하시겠습니까?')) {
+            // 초기화 버튼
+            const handleReset = useCallback(() => {
+                if (window.confirm('디자인 설정을 기본값으로 초기화하시겠습니까?')) {
                     setSettings(defaultSettings);
-                    localStorage.setItem('scoreboard-design', JSON.stringify(defaultSettings));
+                    alert('디자인이 초기화되었습니다. 저장을 눌러 적용하세요.');
                 }
-            };
+            }, []);
 
-            const fontOptions = [
-                'Noto Sans KR',
-                'Black Han Sans',
-                'Do Hyeon',
-                'Jua',
-                'Nanum Gothic',
-                'Arial',
-                'sans-serif'
-            ];
-
-            const fontWeights = [
-                { value: '300', label: '가늘게' },
-                { value: '400', label: '보통' },
-                { value: '500', label: '중간' },
-                { value: '700', label: '굵게' },
-                { value: '900', label: '아주 굵게' }
-            ];
+            if (loading) {
+                return React.createElement('div', { className: 'container' }, '설정 불러오는 중...');
+            }
 
             return React.createElement('div', { className: 'container' }, [
                 React.createElement('h2', { key: 'title' }, '스코어보드 디자인 설정'),
 
-                // 색상 설정
-                React.createElement('div', { key: 'colors', className: 'section' }, [
-                    React.createElement('div', { key: 'section-title', className: 'section-title' }, '색상 설정'),
-                    React.createElement('div', { key: 'color-grid', className: 'color-grid' }, [
-                        React.createElement('div', { key: 'teamname-bg', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '팀명 배경색'),
+                // 1. 색상 설정
+                React.createElement('div', { key: 'colors-group', className: 'section-group' }, [
+                    React.createElement('h3', { key: 'h3-colors' }, '색상 설정'),
+                    // 팀명 배경색
+                    React.createElement('div', { key: 'teamNameBg', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '팀명/라벨 배경색'),
+                        React.createElement('div', { className: 'color-control' }, [
                             React.createElement('input', {
                                 key: 'input',
                                 type: 'color',
                                 value: settings.colors.teamNameBg,
                                 onChange: (e) => updateColor('teamNameBg', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                key: 'text',
+                                type: 'text',
+                                value: settings.colors.teamNameBg,
+                                onChange: (e) => updateColor('teamNameBg', e.target.value)
                             })
-                        ]),
-                        React.createElement('div', { key: 'score-bg', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '점수 배경색'),
+                        ])
+                    ]),
+                    // 점수 배경색
+                    React.createElement('div', { key: 'scoreBg', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '점수 배경색'),
+                        React.createElement('div', { className: 'color-control' }, [
                             React.createElement('input', {
                                 key: 'input',
                                 type: 'color',
                                 value: settings.colors.scoreBg,
                                 onChange: (e) => updateColor('scoreBg', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                key: 'text',
+                                type: 'text',
+                                value: settings.colors.scoreBg,
+                                onChange: (e) => updateColor('scoreBg', e.target.value)
                             })
-                        ]),
-                        React.createElement('div', { key: 'current-set', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '현재 세트 강조색'),
+                        ])
+                    ]),
+                    // 현재 세트 하이라이트 색상
+                    React.createElement('div', { key: 'currentSetHighlight', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '현재 세트 하이라이트 색상'),
+                        React.createElement('div', { className: 'color-control' }, [
                             React.createElement('input', {
                                 key: 'input',
                                 type: 'color',
                                 value: settings.colors.currentSetHighlight,
                                 onChange: (e) => updateColor('currentSetHighlight', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                key: 'text',
+                                type: 'text',
+                                value: settings.colors.currentSetHighlight,
+                                onChange: (e) => updateColor('currentSetHighlight', e.target.value)
                             })
-                        ]),
-                        React.createElement('div', { key: 'text-color', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '텍스트 색상'),
+                        ])
+                    ]),
+                    // 텍스트 색상
+                    React.createElement('div', { key: 'textColor', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '텍스트 색상'),
+                        React.createElement('div', { className: 'color-control' }, [
                             React.createElement('input', {
                                 key: 'input',
                                 type: 'color',
                                 value: settings.colors.textColor,
                                 onChange: (e) => updateColor('textColor', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                key: 'text',
+                                type: 'text',
+                                value: settings.colors.textColor,
+                                onChange: (e) => updateColor('textColor', e.target.value)
                             })
-                        ]),
-                        React.createElement('div', { key: 'border-color', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '테두리 색상'),
+                        ])
+                    ]),
+                    // 테두리 색상
+                    React.createElement('div', { key: 'borderColor', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '테두리 색상'),
+                        React.createElement('div', { className: 'color-control' }, [
                             React.createElement('input', {
                                 key: 'input',
                                 type: 'color',
+                                value: settings.colors.borderColor.replace(/rgba?\(.*?\)/, settings.colors.borderColor.match(/#[0-9a-fA-F]{6}/) ? settings.colors.borderColor : '#000000'), // 단순화를 위해 color input은 RGB/HEX만 사용
+                                onChange: (e) => updateColor('borderColor', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                key: 'text',
+                                type: 'text',
                                 value: settings.colors.borderColor,
                                 onChange: (e) => updateColor('borderColor', e.target.value)
                             })
                         ])
-                    ])
-                ]),
-
-                // 폰트 설정
-                React.createElement('div', { key: 'fonts', className: 'section' }, [
-                    React.createElement('div', { key: 'section-title', className: 'section-title' }, '폰트 설정'),
-                    React.createElement('div', { key: 'font-controls', className: 'font-controls' }, [
-                        React.createElement('div', { key: 'font-family', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '폰트'),
-                            React.createElement('select', {
-                                key: 'select',
-                                value: settings.font.family,
-                                onChange: (e) => updateFont('family', e.target.value)
-                            }, fontOptions.map(font =>
-                                React.createElement('option', { key: font, value: font }, font)
-                            ))
-                        ]),
-                        React.createElement('div', { key: 'font-weight', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '굵기'),
-                            React.createElement('select', {
-                                key: 'select',
-                                value: settings.font.weight,
-                                onChange: (e) => updateFont('weight', e.target.value)
-                            }, fontWeights.map(w =>
-                                React.createElement('option', { key: w.value, value: w.value }, w.label)
-                            ))
-                        ]),
-                        React.createElement('div', { key: 'font-italic', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, '기울임'),
-                            React.createElement('div', { key: 'checkbox', className: 'checkbox-group' }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    checked: settings.font.italic,
-                                    onChange: (e) => updateFont('italic', e.target.checked)
-                                }),
-                                React.createElement('span', { key: 'text' }, '이탤릭체')
-                            ])
-                        ])
                     ]),
-                    React.createElement('div', { key: 'font-sizes', className: 'color-grid', style: { marginTop: '16px' } }, [
-                        React.createElement('div', { key: 'teamname-size', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, `팀명 크기: ${settings.font.teamNameSize}px`),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'range',
-                                min: 12,
-                                max: 32,
-                                value: settings.font.teamNameSize,
-                                onChange: (e) => updateFont('teamNameSize', parseInt(e.target.value))
-                            })
-                        ]),
-                        React.createElement('div', { key: 'score-size', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, `점수 크기: ${settings.font.scoreSize}px`),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'range',
-                                min: 16,
-                                max: 48,
-                                value: settings.font.scoreSize,
-                                onChange: (e) => updateFont('scoreSize', parseInt(e.target.value))
-                            })
-                        ])
+                ]),
+
+                // 2. 폰트 설정
+                React.createElement('div', { key: 'font-group', className: 'section-group' }, [
+                    React.createElement('h3', { key: 'h3-font' }, '폰트 설정'),
+                    // 폰트 종류
+                    React.createElement('div', { key: 'family', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '폰트 종류'),
+                        React.createElement('select', {
+                            key: 'select',
+                            value: settings.font.family,
+                            onChange: (e) => updateFont('family', e.target.value)
+                        }, FONT_OPTIONS.map(opt => 
+                            React.createElement('option', { key: opt.value, value: opt.value }, opt.name)
+                        ))
+                    ]),
+                    // 폰트 굵기
+                    React.createElement('div', { key: 'weight', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '폰트 굵기 (400, 500, 700, 900)'),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'number',
+                            value: settings.font.weight,
+                            onChange: (e) => updateFont('weight', parseInt(e.target.value))
+                        })
+                    ]),
+                    // 폰트 이탤릭
+                    React.createElement('div', { key: 'italic', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, '기울임 (이탤릭)'),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'checkbox',
+                            checked: settings.font.italic,
+                            onChange: (e) => updateFont('italic', e.target.checked)
+                        })
+                    ]),
+                    // 팀명 폰트 크기
+                    React.createElement('div', { key: 'teamNameSize', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, `팀명/라벨 폰트 크기: ${settings.font.teamNameSize}px`),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'range',
+                            min: 10,
+                            max: 40,
+                            value: settings.font.teamNameSize,
+                            onChange: (e) => updateFont('teamNameSize', parseInt(e.target.value))
+                        })
+                    ]),
+                    // 점수 폰트 크기
+                    React.createElement('div', { key: 'scoreSize', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, `점수 폰트 크기: ${settings.font.scoreSize}px`),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'range',
+                            min: 20,
+                            max: 80,
+                            value: settings.font.scoreSize,
+                            onChange: (e) => updateFont('scoreSize', parseInt(e.target.value))
+                        })
                     ])
                 ]),
 
-                // 스타일 설정
-                React.createElement('div', { key: 'styles', className: 'section' }, [
-                    React.createElement('div', { key: 'section-title', className: 'section-title' }, '스타일 설정'),
-                    React.createElement('div', { key: 'style-controls', className: 'color-grid' }, [
-                        React.createElement('div', { key: 'border-width', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, `테두리 굵기: ${settings.style.borderWidth}px`),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'range',
-                                min: 0,
-                                max: 5,
-                                value: settings.style.borderWidth,
-                                onChange: (e) => updateStyle('borderWidth', parseInt(e.target.value))
-                            })
-                        ]),
-                        React.createElement('div', { key: 'border-radius', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, `모서리 둥글기: ${settings.style.borderRadius}px`),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'range',
-                                min: 0,
-                                max: 20,
-                                value: settings.style.borderRadius,
-                                onChange: (e) => updateStyle('borderRadius', parseInt(e.target.value))
-                            })
-                        ]),
-                        React.createElement('div', { key: 'opacity', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, `투명도: ${settings.style.opacity}%`),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'range',
-                                min: 50,
-                                max: 100,
-                                value: settings.style.opacity,
-                                onChange: (e) => updateStyle('opacity', parseInt(e.target.value))
-                            })
-                        ]),
-                        React.createElement('div', { key: 'shadow', className: 'control-group' }, [
-                            React.createElement('label', { key: 'label' }, `그림자 강도: ${settings.style.shadowIntensity}`),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'range',
-                                min: 0,
-                                max: 10,
-                                value: settings.style.shadowIntensity,
-                                onChange: (e) => updateStyle('shadowIntensity', parseInt(e.target.value))
-                            })
-                        ])
+                // 3. 스타일 설정
+                React.createElement('div', { key: 'style-group', className: 'section-group' }, [
+                    React.createElement('h3', { key: 'h3-style' }, '스타일 설정'),
+                    // 테두리 굵기
+                    React.createElement('div', { key: 'borderWidth', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, `테두리 굵기: ${settings.style.borderWidth}px`),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'range',
+                            min: 0,
+                            max: 10,
+                            value: settings.style.borderWidth,
+                            onChange: (e) => updateStyle('borderWidth', parseInt(e.target.value))
+                        })
+                    ]),
+                    // 테두리 둥글기
+                    React.createElement('div', { key: 'borderRadius', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, `테두리 둥글기: ${settings.style.borderRadius}px`),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'range',
+                            min: 0,
+                            max: 30,
+                            value: settings.style.borderRadius,
+                            onChange: (e) => updateStyle('borderRadius', parseInt(e.target.value))
+                        })
+                    ]),
+                    // 투명도
+                    React.createElement('div', { key: 'opacity', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, `투명도: ${settings.style.opacity}%`),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'range',
+                            min: 10,
+                            max: 100,
+                            value: settings.style.opacity,
+                            onChange: (e) => updateStyle('opacity', parseInt(e.target.value))
+                        })
+                    ]),
+                    // 그림자 강도
+                    React.createElement('div', { key: 'shadowIntensity', className: 'control-group' }, [
+                        React.createElement('label', { key: 'label' }, `그림자 강도: ${settings.style.shadowIntensity} (0~10)`),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'range',
+                            min: 0,
+                            max: 10,
+                            value: settings.style.shadowIntensity,
+                            onChange: (e) => updateStyle('shadowIntensity', parseInt(e.target.value))
+                        })
                     ])
                 ]),
 
@@ -473,7 +480,7 @@
                         key: 'save',
                         className: 'save-button',
                         onClick: handleSave
-                    }, '저장'),
+                    }, loading ? '저장 중...' : '저장'),
                     React.createElement('button', {
                         key: 'reset',
                         className: 'reset-button',
@@ -485,7 +492,7 @@
 
         ReactDOM.render(
             React.createElement(DesignSettings),
-            document.getElementById('root')
+            rootElement
         );
     </script>
 </body>
