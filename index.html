@@ -146,10 +146,10 @@
     </div>
 
     <script>
-        // ✅ 올바른 Google Apps Script URL만 포함되어 있습니다.
+        // Google Apps Script URL (데이터 Read/Write용)
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySEAl2UC3nulSGi2l5-6RuqdWQ6ke9Y2VXyl-bo3XxNzOrrEgmwMcj09iNbbfg-88L/exec';
 
-        // 드래그 기능
+        // 드래그 기능 (스코어보드 위치 조정)
         const container = document.querySelector('.scoreboard-container');
         const dragHandle = document.querySelector('.drag-handle');
         let isDragging = false;
@@ -307,6 +307,7 @@
             }
 
             scoreboardDiv.innerHTML = html;
+            // G열에 있는 디자인 설정 JSON 데이터를 파싱하여 적용
             applyDesignSettings(rows[0][6]); 
         }
 
@@ -399,9 +400,13 @@
                     if (result.status === 'success') {
                         console.log('구글 시트 데이터:', result.data);
                         renderScoreboard(result);
+                    } else {
+                        console.error('데이터 로드 실패 (Google Script 오류):', result.message);
                     }
                 })
-                .catch(error => console.error('데이터 로딩 오류:', error));
+                .catch(error => {
+                    console.error('데이터 로딩 오류 (네트워크/CORS 문제):', error);
+                });
         }
 
         // 2초마다 데이터 갱신
