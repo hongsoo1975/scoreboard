@@ -146,7 +146,7 @@
     </div>
 
     <script>
-        // 이전에 삽입 요청하셨던 올바른 Google Apps Script URL
+        // ✅ 올바른 Google Apps Script URL만 포함되어 있습니다.
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySEAl2UC3nulSGi2l5-6RuqdWQ6ke9Y2VXyl-bo3XxNzOrrEgmwMcj09iNbbfg-88L/exec';
 
         // 드래그 기능
@@ -182,7 +182,7 @@
         function renderScoreboard(data) {
             const rows = data.data;
             const layout = rows[0][8] || 'vertical'; 
-            const mode = rows[0][1]; // '1', '2', '3' 또는 'single'
+            const mode = rows[0][1];
             const gameMode = (mode === 'single') ? 'single' : '3set';
             const courtChanged = rows[0][9] === true || rows[0][9] === 'true'; 
             const currentSet = parseInt(mode) || 1; 
@@ -307,11 +307,10 @@
             }
 
             scoreboardDiv.innerHTML = html;
-            // G열에 있는 디자인 설정 JSON 데이터를 파싱하여 적용
             applyDesignSettings(rows[0][6]); 
         }
 
-        // 디자인 설정 적용 함수 (기존 index.html 내용 유지)
+        // 디자인 설정 적용 함수
         function applyDesignSettings(settingsJson) {
             if (!settingsJson || settingsJson === '{...}' || !settingsJson.startsWith('{')) return;
 
