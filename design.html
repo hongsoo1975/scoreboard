@@ -168,7 +168,7 @@
 <body>
     <div id="root"></div>
     <script type="text/javascript">
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS1LRlO0BaUvgLlXUVGhnlkUgD8hxN0VepWhvcNWtu5zn1fnHSR7vQah4TPx2SdmTP/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySEAl2UC3nulSGi2l5-6RuqdWQ6ke9Y2VXyl-bo3XxNzOrrEgmwMcj09iNbbfg-88L/exec';
         
         const DesignSettings = () => {
             const defaultSettings = {
@@ -259,7 +259,6 @@
                 // 구글 시트에도 저장
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
