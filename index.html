@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>스코어보드</title>
     <style>
-        /* CSS 스타일 시작 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
         
         * {
@@ -136,7 +135,6 @@
         .vertical-layout table {
             display: inline-block;
         }
-        /* CSS 스타일 끝 */
     </style>
 </head>
 <body>
@@ -146,10 +144,9 @@
     </div>
 
     <script>
-        // Google Apps Script URL (데이터 Read/Write용)
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySEAl2UC3nulSGi2l5-6RuqdWQ6ke9Y2VXyl-bo3XxNzOrrEgmwMcj09iNbbfg-88L/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBw3R7BSgYEarUji3lKG6gITglHfOpFAmnv3Ns-mLbpvdy0G4HlIxTr3hIXW2suqHM/exec';
 
-        // 드래그 기능 (스코어보드 위치 조정)
+        // 드래그 기능
         const container = document.querySelector('.scoreboard-container');
         const dragHandle = document.querySelector('.drag-handle');
         let isDragging = false;
@@ -178,22 +175,25 @@
             isDragging = false;
         });
 
-        // 스코어보드 렌더링 함수
+        let currentLayout = 'vertical';
+        let currentMode = '3set';
+
         function renderScoreboard(data) {
             const rows = data.data;
-            const layout = rows[0][8] || 'vertical'; 
-            const mode = rows[0][1];
+            const layout = rows[0][8] || 'vertical'; // I열
+            const mode = rows[0][1]; // B열
             const gameMode = (mode === 'single') ? 'single' : '3set';
-            const courtChanged = rows[0][9] === true || rows[0][9] === 'true'; 
-            const currentSet = parseInt(mode) || 1; 
-            const pointSystem = parseInt(rows[0][5]) || 15;
-            const eventName = rows[0][7] || '대회명';
+            const courtChanged = rows[0][9] === true || rows[0][9] === 'true'; // J열
+            const currentSet = parseInt(mode) || 1;
+            const pointSystem = parseInt(rows[0][5]) || 15; // F열
+            const eventName = rows[0][7] || '대회명'; // H열
 
             let team1Name = rows[0][0] || '팀 1';
             let team2Name = rows[1][0] || '팀 2';
             let team1Scores = [rows[0][2] || 0, rows[0][3] || 0, rows[0][4] || 0];
             let team2Scores = [rows[1][2] || 0, rows[1][3] || 0, rows[1][4] || 0];
 
+            // 가로형일 때 코트체인지 적용
             if (layout === 'horizontal' && courtChanged) {
                 [team1Name, team2Name] = [team2Name, team1Name];
                 [team1Scores, team2Scores] = [team2Scores, team1Scores];
@@ -209,11 +209,11 @@
                 html = `
                     <table>
                         <tr>
-                            <td class="label" colspan="${currentSet}">3세트 경기</td>
+                            <td class="label" colspan="2">3세트 경기</td>
                         </tr>
                         <tr>
                             <td class="label">1세트</td>
-                            ${currentSet >= 2 ? '<td class="label">2세트</td>' : ''}
+                            <td class="label">2세트</td>
                             ${currentSet >= 3 ? '<td class="label">3세트</td>' : ''}
                         </tr>
                         <tr>
@@ -307,31 +307,31 @@
             }
 
             scoreboardDiv.innerHTML = html;
-            // G열에 있는 디자인 설정 JSON 데이터를 파싱하여 적용
-            applyDesignSettings(rows[0][6]); 
+            applyDesignSettings(rows[0][6]); // G열에서 디자인 설정 읽기
         }
 
-        // 디자인 설정 적용 함수
         function applyDesignSettings(settingsJson) {
             if (!settingsJson || settingsJson === '{...}' || !settingsJson.startsWith('{')) return;
 
             try {
                 const settings = JSON.parse(settingsJson);
                 const table = document.querySelector('table');
-                if (!table) return;
 
                 // 테두리 색상과 굵기 적용
                 if (settings.style && settings.style.borderWidth !== undefined) {
                     const borderWidth = settings.style.borderWidth;
                     const borderColor = settings.colors?.borderColor || 'rgba(30, 58, 138, 0.8)';
                     
+                    // 테이블 외곽선
                     table.style.border = `${borderWidth}px solid ${borderColor}`;
                     
+                    // 셀 내부 경계선
                     document.querySelectorAll('td').forEach(el => {
                         el.style.borderRight = `${borderWidth}px solid ${borderColor}`;
                         el.style.borderBottom = `${borderWidth}px solid ${borderColor}`;
                     });
                     
+                    // 마지막 셀들은 테두리 제거
                     document.querySelectorAll('td:last-child').forEach(el => {
                         el.style.borderRight = 'none';
                     });
@@ -342,7 +342,7 @@
 
                 // 색상 적용
                 if (settings.colors) {
-                    document.querySelectorAll('.team-name, .label, .event-name, .point-system').forEach(el => {
+                    document.querySelectorAll('.team-name').forEach(el => {
                         el.style.background = settings.colors.teamNameBg || '#1e3a8a';
                         el.style.color = settings.colors.textColor || '#ffffff';
                     });
@@ -356,6 +356,11 @@
                         el.style.background = settings.colors.currentSetHighlight || '#3b82f6';
                         el.style.color = settings.colors.textColor || '#ffffff';
                     });
+                    
+                    document.querySelectorAll('.label, .event-name').forEach(el => {
+                        el.style.background = settings.colors.teamNameBg || '#1e3a8a';
+                        el.style.color = settings.colors.textColor || '#ffffff';
+                    });
                 }
 
                 // 폰트 적용
@@ -365,34 +370,28 @@
                         el.style.fontWeight = settings.font.weight || '700';
                         el.style.fontStyle = settings.font.italic ? 'italic' : 'normal';
                     });
-
-                    document.querySelectorAll('.team-name, .label').forEach(el => {
-                        el.style.fontSize = `${settings.font.teamNameSize || 24}px`;
-                    });
-                    document.querySelectorAll('.score').forEach(el => {
-                        el.style.fontSize = `${settings.font.scoreSize || 32}px`;
-                    });
                 }
 
-                // 기타 스타일 적용
-                if (settings.style) {
-                    if (settings.style.borderRadius !== undefined) {
-                        table.style.borderRadius = `${settings.style.borderRadius}px`;
-                    }
-                    if (settings.style.opacity !== undefined) {
-                        table.style.opacity = settings.style.opacity / 100;
-                    }
-                    if (settings.style.shadowIntensity !== undefined) {
-                        const shadow = settings.style.shadowIntensity;
-                        table.style.boxShadow = `0 ${shadow}px ${shadow * 1.5}px rgba(0,0,0,0.3)`;
-                    }
+                // 테두리 둥글기 적용
+                if (settings.style && settings.style.borderRadius !== undefined) {
+                    table.style.borderRadius = `${settings.style.borderRadius}px`;
+                }
+
+                // 투명도 적용
+                if (settings.style && settings.style.opacity !== undefined) {
+                    table.style.opacity = settings.style.opacity / 100;
+                }
+
+                // 그림자 적용
+                if (settings.style && settings.style.shadowIntensity !== undefined) {
+                    const shadow = settings.style.shadowIntensity;
+                    table.style.boxShadow = `0 ${shadow}px ${shadow * 1.5}px rgba(0,0,0,0.3)`;
                 }
             } catch (e) {
                 console.error('디자인 설정 적용 오류:', e);
             }
         }
 
-        // 데이터 로드 및 갱신
         function loadData() {
             fetch(GOOGLE_SCRIPT_URL)
                 .then(response => response.json())
@@ -400,16 +399,11 @@
                     if (result.status === 'success') {
                         console.log('구글 시트 데이터:', result.data);
                         renderScoreboard(result);
-                    } else {
-                        console.error('데이터 로드 실패 (Google Script 오류):', result.message);
                     }
                 })
-                .catch(error => {
-                    console.error('데이터 로딩 오류 (네트워크/CORS 문제):', error);
-                });
+                .catch(error => console.error('데이터 로딩 오류:', error));
         }
 
-        // 2초마다 데이터 갱신
         setInterval(loadData, 2000);
         loadData();
     </script>
