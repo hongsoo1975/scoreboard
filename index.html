@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>중계 스코어보드</title>
+<style>
+  body{margin:0;background:transparent;color:#fff;font-family:"Noto Sans KR",sans-serif;}
+  .wrap{display:flex;align-items:center;justify-content:center;height:100%;}
+  .board{display:flex;align-items:center;gap:40px;background:rgba(0,0,0,0.5);padding:20px 40px;border-radius:12px;}
+  .team{display:flex;flex-direction:column;align-items:center;min-width:200px;}
+  .name{font-size:32px;font-weight:700;}
+  .score{font-size:80px;font-weight:900;}
+  .sets{font-size:20px;margin-top:6px;}
+  .center{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:160px;}
+  .vs{font-size:36px;font-weight:900;color:#ffd45e;}
+  .set-info{font-size:18px;}
+  .limit{font-size:16px;opacity:0.8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="board">
+    <div class="team" id="team1">
+      <div class="name" id="team1_name">TEAM 1</div>
+      <div class="score" id="team1_score">0</div>
+      <div class="sets" id="team1_sets">0</div>
+    </div>
+    <div class="center">
+      <div class="vs">VS</div>
+      <div class="set-info" id="set_info">단일 세트</div>
+      <div class="limit" id="limit_info"></div>
+    </div>
+    <div class="team" id="team2">
+      <div class="name" id="team2_name">TEAM 2</div>
+      <div class="score" id="team2_score">0</div>
+      <div class="sets" id="team2_sets">0</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbx0zi0ZIMlvnCro-ggI89C68aVHupn3A-2autiHJTCO20np2ctt3lZnLTf_DSX0bbuz/exec";
+const POLL_INTERVAL = 1000;
+
+async function fetchState(){
+  try{
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    applyState(data);
+  }catch(e){ console.error(e); }
+}
+
+function applyState(data){
+  const cfg = data.config || {};
+  const teams = data.teams || [];
+
+  // 모드 표시
+  document.getElementById('set_info').textContent =
+    (cfg.mode === 'best_of_3') ? `세트 ${cfg.current_set||1}/3` : '단일 세트';
+
+  // 점수 제한
+  document.getElementById('limit_info').textContent =
+    cfg.point_limit ? `점수 제한 ${cfg.point_limit}` : '';
+
+  // 팀 데이터
+  if(teams[0]){
+    document.getElementById('team1_name').textContent = teams[0].team_name || 'TEAM 1';
+    document.getElementById('team1_score').textContent = teams[0].score ?? 0;
+    document.getElementById('team1_sets').textContent = teams[0].sets_won ?? 0;
+  }
+  if(teams[1]){
+    document.getElementById('team2_name').textContent = teams[1].team_name || 'TEAM 2';
+    document.getElementById('team2_score').textContent = teams[1].score ?? 0;
+    document.getElementById('team2_sets').textContent = teams[1].sets_won ?? 0;
+  }
+
+  // 세트 표시 on/off
+  const showSets = (cfg.mode === 'best_of_3');
+  document.getElementById('team1_sets').style.display = showSets ? 'block' : 'none';
+  document.getElementById('team2_sets').style.display = showSets ? 'block' : 'none';
+}
+
+fetchState();
+setInterval(fetchState, POLL_INTERVAL);
+</script>
+</body>
+</html>
