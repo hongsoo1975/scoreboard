@@ -10,9 +10,9 @@
     .scoreboard { background: rgba(255, 255, 255, 0.95); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 700px; margin: 0 auto; }
     .title { text-align: center; padding: 15px; font-weight: bold; background: #f0f0f0; font-size: 24px; }
     .score-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .team-name-cell { text-align: center; padding: 15px; font-weight: bold; width: 35%; }
-    .score-cell { text-align: center; padding: 20px; position: relative; width: 30%; }
-    .sets-cell { text-align: center; padding: 10px; width: 5%; font-size: 18px; font-weight: bold; }
+    .team-name-cell { text-align: center; padding: 15px; font-weight: bold; }
+    .score-cell { text-align: center; padding: 20px; position: relative; }
+    .sets-cell { text-align: center; padding: 10px; font-size: 18px; font-weight: bold; }
     .team-score { font-weight: bold; line-height: 1; }
     .vs-cell { text-align: center; font-weight: bold; padding: 0 20px; background: #f8f8f8; width: 8%; vertical-align: middle; }
     .round-info-cell { text-align: center; padding: 15px; font-weight: bold; background: #e8e8e8; width: 12%; }
@@ -23,6 +23,14 @@
   <div class="scoreboard" id="scoreboard">
     <div class="title" id="title">족구 스코어보드</div>
     <table class="score-table">
+      <colgroup>
+        <col style="width: 28%;">
+        <col style="width: 7%;">
+        <col style="width: 8%;">
+        <col style="width: 7%;">
+        <col style="width: 28%;">
+        <col style="width: 12%;">
+      </colgroup>
       <tr>
         <td class="team-name-cell" colspan="2" id="team1NameCell"><div id="team1Name">팀1</div></td>
         <td class="vs-cell" rowspan="2" id="vsCell">VS</td>
