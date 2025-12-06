@@ -152,18 +152,34 @@
       document.getElementById('team2NameCell').style.backgroundColor = d.team2BgColor || '#CC0000';
       document.getElementById('team2NameCell').style.color = d.fontColor || '#FFFFFF';
       
-      // 점수
-      const scoreStyle = `font-size: ${d.scoreFontSize || '80'}px; font-family: ${d.fontFamily || 'Arial'}; font-weight: ${d.fontWeight || 'bold'}; font-style: ${d.fontStyle || 'normal'}; color: ${d.fontColor || '#FFFFFF'};`;
-      document.getElementById('team1Score').style.cssText = scoreStyle;
-      document.getElementById('team2Score').style.cssText = scoreStyle;
+      // 점수 - 개별 속성으로 설정
+      document.getElementById('team1Score').style.fontSize = (d.scoreFontSize || '80') + 'px';
+      document.getElementById('team1Score').style.fontFamily = d.fontFamily || 'Arial';
+      document.getElementById('team1Score').style.fontWeight = d.fontWeight || 'bold';
+      document.getElementById('team1Score').style.fontStyle = d.fontStyle || 'normal';
+      document.getElementById('team1Score').style.color = d.fontColor || '#FFFFFF';
+      
+      document.getElementById('team2Score').style.fontSize = (d.scoreFontSize || '80') + 'px';
+      document.getElementById('team2Score').style.fontFamily = d.fontFamily || 'Arial';
+      document.getElementById('team2Score').style.fontWeight = d.fontWeight || 'bold';
+      document.getElementById('team2Score').style.fontStyle = d.fontStyle || 'normal';
+      document.getElementById('team2Score').style.color = d.fontColor || '#FFFFFF';
       
       document.getElementById('team1ScoreCell').style.backgroundColor = d.scoreBgColor || '#333333';
       document.getElementById('team2ScoreCell').style.backgroundColor = d.scoreBgColor || '#333333';
       
-      // 승리세트
-      const setsStyle = `font-size: ${d.setScoreFontSize || '28'}px; font-family: ${d.fontFamily || 'Arial'}; font-weight: ${d.fontWeight || 'bold'}; font-style: ${d.fontStyle || 'normal'}; color: ${d.fontColor || '#FFFFFF'};`;
-      document.getElementById('team1Sets').style.cssText = setsStyle;
-      document.getElementById('team2Sets').style.cssText = setsStyle;
+      // 승리세트 - 개별 속성으로 설정
+      document.getElementById('team1Sets').style.fontSize = (d.setScoreFontSize || '28') + 'px';
+      document.getElementById('team1Sets').style.fontFamily = d.fontFamily || 'Arial';
+      document.getElementById('team1Sets').style.fontWeight = d.fontWeight || 'bold';
+      document.getElementById('team1Sets').style.fontStyle = d.fontStyle || 'normal';
+      document.getElementById('team1Sets').style.color = d.fontColor || '#FFFFFF';
+      
+      document.getElementById('team2Sets').style.fontSize = (d.setScoreFontSize || '28') + 'px';
+      document.getElementById('team2Sets').style.fontFamily = d.fontFamily || 'Arial';
+      document.getElementById('team2Sets').style.fontWeight = d.fontWeight || 'bold';
+      document.getElementById('team2Sets').style.fontStyle = d.fontStyle || 'normal';
+      document.getElementById('team2Sets').style.color = d.fontColor || '#FFFFFF';
       
       document.getElementById('team1SetsCell').style.backgroundColor = d.scoreBgColor || '#333333';
       document.getElementById('team2SetsCell').style.backgroundColor = d.scoreBgColor || '#333333';
