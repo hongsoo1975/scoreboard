@@ -110,7 +110,11 @@
     function applyDesign() {
       const d = currentDesign;
       
-      // 테두리
+      // 외곽 테두리와 전체 높이 조정
+      const obwNum = parseInt(d.outerBorderWidth || '3');
+      const bwNum = parseInt(d.borderWidth || '3');
+      const totalHeight = obwNum * 2 + 43 + bwNum + 43 + bwNum + 43;
+      document.querySelector('.scoreboard-wrapper').style.height = totalHeight + 'px';
       const bw = (d.borderWidth || '3') + 'px';
       const bc = d.borderColor || '#000000';
       const obw = (d.outerBorderWidth || '3') + 'px';
