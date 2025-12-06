@@ -1,88 +1,315 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>중계 스코어보드</title>
-<style>
-  body{margin:0;background:transparent;color:#fff;font-family:"Noto Sans KR",sans-serif;}
-  .wrap{display:flex;align-items:center;justify-content:center;height:100%;}
-  .board{display:flex;align-items:center;gap:40px;background:rgba(0,0,0,0.5);padding:20px 40px;border-radius:12px;}
-  .team{display:flex;flex-direction:column;align-items:center;min-width:200px;}
-  .name{font-size:32px;font-weight:700;}
-  .score{font-size:80px;font-weight:900;}
-  .sets{font-size:20px;margin-top:6px;}
-  .center{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:160px;}
-  .vs{font-size:36px;font-weight:900;color:#ffd45e;}
-  .set-info{font-size:18px;}
-  .limit{font-size:16px;opacity:0.8;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>족구 스코어보드</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: transparent;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .scoreboard {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .title {
+      text-align: center;
+      padding: 15px;
+      font-weight: bold;
+      background: #f0f0f0;
+      font-size: 24px;
+    }
+    
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .team-name-cell {
+      text-align: center;
+      padding: 15px;
+      font-weight: bold;
+    }
+    
+    .score-cell {
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+    
+    .score-container {
+      display: inline-flex;
+      align-items: flex-end;
+      line-height: 1;
+    }
+    
+    .team-score {
+      font-weight: bold;
+      line-height: 1;
+    }
+    
+    .team-sets {
+      margin-left: 8px;
+      margin-bottom: 8px;
+      opacity: 0.85;
+    }
+    
+    .vs-cell {
+      text-align: center;
+      font-weight: bold;
+      padding: 0 20px;
+      background: #f8f8f8;
+    }
+    
+    .round-info-cell {
+      text-align: center;
+      padding: 0 20px;
+      font-weight: bold;
+      background: #e8e8e8;
+    }
+    
+    .current-set-indicator {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: #FFD700;
+      color: #000;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 20px;
+      color: #dc3545;
+      font-size: 18px;
+      background: #f8d7da;
+      border-radius: 10px;
+      margin: 20px;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="board">
-    <div class="team" id="team1">
-      <div class="name" id="team1_name">TEAM 1</div>
-      <div class="score" id="team1_score">0</div>
-      <div class="sets" id="team1_sets">0</div>
-    </div>
-    <div class="center">
-      <div class="vs">VS</div>
-      <div class="set-info" id="set_info">단일 세트</div>
-      <div class="limit" id="limit_info"></div>
-    </div>
-    <div class="team" id="team2">
-      <div class="name" id="team2_name">TEAM 2</div>
-      <div class="score" id="team2_score">0</div>
-      <div class="sets" id="team2_sets">0</div>
-    </div>
+  <div class="scoreboard" id="scoreboard">
+    <div class="title" id="title">족구 스코어보드</div>
+    
+    <table class="score-table">
+      <tr>
+        <td class="team-name-cell" id="team1NameCell">
+          <div id="team1Name">팀1</div>
+        </td>
+        <td class="vs-cell" rowspan="2">VS</td>
+        <td class="team-name-cell" id="team2NameCell">
+          <div id="team2Name">팀2</div>
+        </td>
+        <td class="round-info-cell" rowspan="2" id="roundInfo">15점제</td>
+      </tr>
+      <tr>
+        <td class="score-cell" id="team1ScoreCell">
+          <div id="currentSetTeam1" class="current-set-indicator" style="display: none;">← 현재세트</div>
+          <div class="score-container">
+            <div class="team-score" id="team1Score">0</div>
+            <div class="team-sets" id="team1Sets" style="display: none;">0</div>
+          </div>
+        </td>
+        <td class="score-cell" id="team2ScoreCell">
+          <div id="currentSetTeam2" class="current-set-indicator" style="display: none;">현재세트 →</div>
+          <div class="score-container">
+            <div class="team-score" id="team2Score">0</div>
+            <div class="team-sets" id="team2Sets" style="display: none;">0</div>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
-</div>
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbx0zi0ZIMlvnCro-ggI89C68aVHupn3A-2autiHJTCO20np2ctt3lZnLTf_DSX0bbuz/exec";
-const POLL_INTERVAL = 1000;
-
-async function fetchState(){
-  try{
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    applyState(data);
-  }catch(e){ console.error(e); }
-}
-
-function applyState(data){
-  const cfg = data.config || {};
-  const teams = data.teams || [];
-
-  // 모드 표시
-  document.getElementById('set_info').textContent =
-    (cfg.mode === 'best_of_3') ? `세트 ${cfg.current_set||1}/3` : '단일 세트';
-
-  // 점수 제한
-  document.getElementById('limit_info').textContent =
-    cfg.point_limit ? `점수 제한 ${cfg.point_limit}` : '';
-
-  // 팀 데이터
-  if(teams[0]){
-    document.getElementById('team1_name').textContent = teams[0].team_name || 'TEAM 1';
-    document.getElementById('team1_score').textContent = teams[0].score ?? 0;
-    document.getElementById('team1_sets').textContent = teams[0].sets_won ?? 0;
-  }
-  if(teams[1]){
-    document.getElementById('team2_name').textContent = teams[1].team_name || 'TEAM 2';
-    document.getElementById('team2_score').textContent = teams[1].score ?? 0;
-    document.getElementById('team2_sets').textContent = teams[1].sets_won ?? 0;
-  }
-
-  // 세트 표시 on/off
-  const showSets = (cfg.mode === 'best_of_3');
-  document.getElementById('team1_sets').style.display = showSets ? 'block' : 'none';
-  document.getElementById('team2_sets').style.display = showSets ? 'block' : 'none';
-}
-
-fetchState();
-setInterval(fetchState, POLL_INTERVAL);
-</script>
+  <script>
+    // Google Apps Script 웹 앱 URL (여러분의 배포 URL로 변경하세요)
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzXVU0Mzcy9TLSU8ajgdXkXCu5EYEihwZhoUWXyQdKCVG_KFatDPb7qGeJh9J5tfhHh/exec';
+    
+    let currentData = {};
+    let currentDesign = {};
+    let errorCount = 0;
+    
+    // URL 파라미터에서 API URL 가져오기 (옵션)
+    function getApiUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const apiParam = urlParams.get('api');
+      return apiParam || API_URL;
+    }
+    
+    async function fetchData() {
+      const apiUrl = getApiUrl();
+      
+      try {
+        const response = await fetch(apiUrl + '?action=getAllData');
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        currentData = data.score;
+        currentDesign = data.design;
+        
+        updateDisplay();
+        errorCount = 0;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        errorCount++;
+        
+        if (errorCount > 3) {
+          showError('데이터를 가져올 수 없습니다. API URL을 확인하세요.');
+        }
+      }
+    }
+    
+    function showError(message) {
+      const scoreboard = document.getElementById('scoreboard');
+      scoreboard.innerHTML = `<div class="error-message">${message}</div>`;
+    }
+    
+    function updateDisplay() {
+      document.getElementById('title').textContent = currentData.matchTitle || '족구 스코어보드';
+      document.getElementById('team1Name').textContent = currentData.team1Name || '팀1';
+      document.getElementById('team2Name').textContent = currentData.team2Name || '팀2';
+      document.getElementById('team1Score').textContent = currentData.team1Score || '0';
+      document.getElementById('team2Score').textContent = currentData.team2Score || '0';
+      document.getElementById('roundInfo').textContent = currentData.roundInfo || '15점제';
+      
+      const totalSets = parseInt(currentData.totalSets) || 1;
+      
+      if (totalSets === 1) {
+        document.getElementById('team1Sets').style.display = 'none';
+        document.getElementById('team2Sets').style.display = 'none';
+        document.getElementById('currentSetTeam1').style.display = 'none';
+        document.getElementById('currentSetTeam2').style.display = 'none';
+      } else {
+        document.getElementById('team1Sets').style.display = 'inline-block';
+        document.getElementById('team2Sets').style.display = 'inline-block';
+        document.getElementById('team1Sets').textContent = currentData.team1Sets || '0';
+        document.getElementById('team2Sets').textContent = currentData.team2Sets || '0';
+        
+        const team1Score = parseInt(currentData.team1Score) || 0;
+        const team2Score = parseInt(currentData.team2Score) || 0;
+        
+        document.getElementById('currentSetTeam1').style.display = 'none';
+        document.getElementById('currentSetTeam2').style.display = 'none';
+        
+        if (team1Score > team2Score) {
+          document.getElementById('currentSetTeam1').style.display = 'block';
+        } else if (team2Score > team1Score) {
+          document.getElementById('currentSetTeam2').style.display = 'block';
+        }
+      }
+      
+      applyDesign();
+    }
+    
+    function applyDesign() {
+      const design = currentDesign;
+      
+      const borderStyle = (design.borderWidth || '3') + 'px solid ' + (design.borderColor || '#000000');
+      const outerBorderStyle = (design.outerBorderWidth || design.borderWidth || '3') + 'px solid ' + (design.outerBorderColor || design.borderColor || '#000000');
+      
+      document.getElementById('scoreboard').style.border = outerBorderStyle;
+      
+      const titleEl = document.getElementById('title');
+      titleEl.style.fontSize = (design.titleFontSize || '28') + 'px';
+      titleEl.style.color = design.titleColor || '#000000';
+      titleEl.style.borderBottom = borderStyle;
+      
+      const allCells = document.querySelectorAll('td');
+      allCells.forEach(function(cell) {
+        cell.style.border = borderStyle;
+      });
+      
+      // 팀명 셀 스타일
+      const team1NameCell = document.getElementById('team1NameCell');
+      const team1Name = document.getElementById('team1Name');
+      team1Name.style.fontSize = (design.teamNameFontSize || '32') + 'px';
+      team1Name.style.fontFamily = design.fontFamily || 'Arial';
+      team1Name.style.color = design.fontColor || '#FFFFFF';
+      team1NameCell.style.backgroundColor = design.team1BgColor || '#0066CC';
+      
+      const team2NameCell = document.getElementById('team2NameCell');
+      const team2Name = document.getElementById('team2Name');
+      team2Name.style.fontSize = (design.teamNameFontSize || '32') + 'px';
+      team2Name.style.fontFamily = design.fontFamily || 'Arial';
+      team2Name.style.color = design.fontColor || '#FFFFFF';
+      team2NameCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      
+      // 점수 셀 스타일
+      const team1ScoreCell = document.getElementById('team1ScoreCell');
+      team1ScoreCell.style.backgroundColor = design.team1BgColor || '#0066CC';
+      
+      const team2ScoreCell = document.getElementById('team2ScoreCell');
+      team2ScoreCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      
+      // 점수 텍스트 스타일
+      const team1ScoreEl = document.getElementById('team1Score');
+      team1ScoreEl.style.fontSize = (design.scoreFontSize || '80') + 'px';
+      team1ScoreEl.style.fontFamily = design.fontFamily || 'Arial';
+      team1ScoreEl.style.color = design.fontColor || '#FFFFFF';
+      
+      const team2ScoreEl = document.getElementById('team2Score');
+      team2ScoreEl.style.fontSize = (design.scoreFontSize || '80') + 'px';
+      team2ScoreEl.style.fontFamily = design.fontFamily || 'Arial';
+      team2ScoreEl.style.color = design.fontColor || '#FFFFFF';
+      
+      // 세트 점수 스타일
+      const team1SetsEl = document.getElementById('team1Sets');
+      team1SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
+      team1SetsEl.style.fontFamily = design.fontFamily || 'Arial';
+      team1SetsEl.style.color = design.fontColor || '#FFFFFF';
+      
+      const team2SetsEl = document.getElementById('team2Sets');
+      team2SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
+      team2SetsEl.style.fontFamily = design.fontFamily || 'Arial';
+      team2SetsEl.style.color = design.fontColor || '#FFFFFF';
+      
+      // 현재 리드팀 배경색 변경
+      const team1Score = parseInt(currentData.team1Score) || 0;
+      const team2Score = parseInt(currentData.team2Score) || 0;
+      
+      if (team1Score > team2Score) {
+        team1ScoreCell.style.backgroundColor = design.currentScoreBgColor || '#FFD700';
+      } else if (team2Score > team1Score) {
+        team2ScoreCell.style.backgroundColor = design.currentScoreBgColor || '#FFD700';
+      }
+      
+      // VS 스타일
+      const vsCell = document.querySelector('.vs-cell');
+      vsCell.style.fontSize = (design.vsFontSize || '60') + 'px';
+      vsCell.style.color = design.vsColor || '#000000';
+      
+      // 라운드 정보 스타일
+      const roundInfoEl = document.getElementById('roundInfo');
+      roundInfoEl.style.fontSize = (design.setInfoFontSize || '24') + 'px';
+      roundInfoEl.style.color = design.setInfoColor || '#000000';
+    }
+    
+    // 초기 로드
+    fetchData();
+    
+    // 1초마다 업데이트
+    setInterval(fetchData, 1000);
+  </script>
 </body>
 </html>
