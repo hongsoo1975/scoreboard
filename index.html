@@ -77,6 +77,7 @@
       padding: 0 20px;
       background: #f8f8f8;
       width: 10%;
+      vertical-align: middle;
     }
     
     .round-info-cell {
@@ -119,7 +120,7 @@
         <td class="team-name-cell" id="team1NameCell">
           <div id="team1Name">팀1</div>
         </td>
-        <td class="vs-cell" rowspan="2">VS</td>
+        <td class="vs-cell" rowspan="2" id="vsCell">VS</td>
         <td class="team-name-cell" id="team2NameCell">
           <div id="team2Name">팀2</div>
         </td>
@@ -146,7 +147,7 @@
 
   <script>
     // Google Apps Script 웹 앱 URL (여러분의 배포 URL로 변경하세요)
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyzqrWHcJI9hGorgJHa0oNARgpyXqp6bPJEm7f1EPoTxcx2lWAh5qpYeSXijuitrPyr/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbx6Kiwof8QiYGmlMiuJxfUt6GKsVipQsojsILT5I06dmBJjFtnk7JX9ZL74z5FT6dut/exec';
     
     let currentData = {};
     let currentDesign = {};
@@ -235,9 +236,13 @@
       
       document.getElementById('scoreboard').style.border = outerBorderStyle;
       
+      // 타이틀
       const titleEl = document.getElementById('title');
       titleEl.style.fontSize = (design.titleFontSize || '28') + 'px';
       titleEl.style.color = design.titleColor || '#000000';
+      titleEl.style.backgroundColor = design.titleBgColor || '#f0f0f0';
+      titleEl.style.fontWeight = design.titleFontWeight || 'bold';
+      titleEl.style.fontStyle = design.titleFontStyle || 'normal';
       titleEl.style.borderBottom = borderStyle;
       
       const allCells = document.querySelectorAll('td');
@@ -251,6 +256,8 @@
       team1Name.style.fontSize = (design.teamNameFontSize || '32') + 'px';
       team1Name.style.fontFamily = design.fontFamily || 'Arial';
       team1Name.style.color = design.fontColor || '#FFFFFF';
+      team1Name.style.fontWeight = design.fontWeight || 'bold';
+      team1Name.style.fontStyle = design.fontStyle || 'normal';
       team1NameCell.style.backgroundColor = design.team1BgColor || '#0066CC';
       
       const team2NameCell = document.getElementById('team2NameCell');
@@ -258,6 +265,8 @@
       team2Name.style.fontSize = (design.teamNameFontSize || '32') + 'px';
       team2Name.style.fontFamily = design.fontFamily || 'Arial';
       team2Name.style.color = design.fontColor || '#FFFFFF';
+      team2Name.style.fontWeight = design.fontWeight || 'bold';
+      team2Name.style.fontStyle = design.fontStyle || 'normal';
       team2NameCell.style.backgroundColor = design.team2BgColor || '#CC0000';
       
       // 점수 셀 스타일 (일반 스코어 배경색 사용)
@@ -272,22 +281,30 @@
       team1ScoreEl.style.fontSize = (design.scoreFontSize || '80') + 'px';
       team1ScoreEl.style.fontFamily = design.fontFamily || 'Arial';
       team1ScoreEl.style.color = design.fontColor || '#FFFFFF';
+      team1ScoreEl.style.fontWeight = design.fontWeight || 'bold';
+      team1ScoreEl.style.fontStyle = design.fontStyle || 'normal';
       
       const team2ScoreEl = document.getElementById('team2Score');
       team2ScoreEl.style.fontSize = (design.scoreFontSize || '80') + 'px';
       team2ScoreEl.style.fontFamily = design.fontFamily || 'Arial';
       team2ScoreEl.style.color = design.fontColor || '#FFFFFF';
+      team2ScoreEl.style.fontWeight = design.fontWeight || 'bold';
+      team2ScoreEl.style.fontStyle = design.fontStyle || 'normal';
       
       // 세트 점수 스타일
       const team1SetsEl = document.getElementById('team1Sets');
       team1SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
       team1SetsEl.style.fontFamily = design.fontFamily || 'Arial';
       team1SetsEl.style.color = design.fontColor || '#FFFFFF';
+      team1SetsEl.style.fontWeight = design.fontWeight || 'bold';
+      team1SetsEl.style.fontStyle = design.fontStyle || 'normal';
       
       const team2SetsEl = document.getElementById('team2Sets');
       team2SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
       team2SetsEl.style.fontFamily = design.fontFamily || 'Arial';
       team2SetsEl.style.color = design.fontColor || '#FFFFFF';
+      team2SetsEl.style.fontWeight = design.fontWeight || 'bold';
+      team2SetsEl.style.fontStyle = design.fontStyle || 'normal';
       
       // 현재 리드팀 배경색 변경
       const team1Score = parseInt(currentData.team1Score) || 0;
@@ -300,9 +317,12 @@
       }
       
       // VS 스타일
-      const vsCell = document.querySelector('.vs-cell');
+      const vsCell = document.getElementById('vsCell');
       vsCell.style.fontSize = (design.vsFontSize || '60') + 'px';
       vsCell.style.color = design.vsColor || '#000000';
+      vsCell.style.backgroundColor = design.vsBgColor || '#f8f8f8';
+      vsCell.style.fontWeight = design.vsFontWeight || 'bold';
+      vsCell.style.fontStyle = design.vsFontStyle || 'normal';
       
       // 라운드 정보 스타일
       const roundInfoEl = document.getElementById('roundInfo');
