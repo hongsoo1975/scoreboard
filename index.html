@@ -44,20 +44,20 @@
       text-align: center;
       padding: 15px;
       font-weight: bold;
-      width: 25%;
+      width: 35%;
     }
     
     .score-cell {
       text-align: center;
       padding: 20px;
       position: relative;
-      width: 20%;
+      width: 28%;
     }
     
     .sets-cell {
       text-align: center;
       padding: 10px;
-      width: 10%;
+      width: 7%;
       font-size: 18px;
       font-weight: bold;
     }
@@ -101,17 +101,11 @@
     
     <table class="score-table">
       <tr>
-        <td class="team-name-cell" id="team1NameCell">
+        <td class="team-name-cell" colspan="2" id="team1NameCell">
           <div id="team1Name">팀1</div>
         </td>
-        <td class="sets-cell" id="team1SetsCell" style="display: none;">
-          <div id="team1Sets">0</div>
-        </td>
         <td class="vs-cell" rowspan="2" id="vsCell">VS</td>
-        <td class="sets-cell" id="team2SetsCell" style="display: none;">
-          <div id="team2Sets">0</div>
-        </td>
-        <td class="team-name-cell" id="team2NameCell">
+        <td class="team-name-cell" colspan="2" id="team2NameCell">
           <div id="team2Name">팀2</div>
         </td>
         <td class="round-info-cell" rowspan="2" id="roundInfo">
@@ -122,8 +116,12 @@
         <td class="score-cell" id="team1ScoreCell">
           <div class="team-score" id="team1Score">0</div>
         </td>
-        <td class="score-cell" id="team1ScoreDummyCell" style="display: none;"></td>
-        <td class="score-cell" id="team2ScoreDummyCell" style="display: none;"></td>
+        <td class="sets-cell" id="team1SetsCell" style="display: none;">
+          <div id="team1Sets">0</div>
+        </td>
+        <td class="sets-cell" id="team2SetsCell" style="display: none;">
+          <div id="team2Sets">0</div>
+        </td>
         <td class="score-cell" id="team2ScoreCell">
           <div class="team-score" id="team2Score">0</div>
         </td>
@@ -202,25 +200,13 @@
         // 단세트: 승리 세트 셀 숨기기
         document.getElementById('team1SetsCell').style.display = 'none';
         document.getElementById('team2SetsCell').style.display = 'none';
-        document.getElementById('team1ScoreDummyCell').style.display = 'none';
-        document.getElementById('team2ScoreDummyCell').style.display = 'none';
-        
-        // 점수 셀 colspan 조정
-        document.getElementById('team1ScoreCell').colSpan = 1;
-        document.getElementById('team2ScoreCell').colSpan = 1;
       } else {
         // 3세트: 승리 세트 셀 표시
         document.getElementById('team1SetsCell').style.display = 'table-cell';
         document.getElementById('team2SetsCell').style.display = 'table-cell';
-        document.getElementById('team1ScoreDummyCell').style.display = 'table-cell';
-        document.getElementById('team2ScoreDummyCell').style.display = 'table-cell';
         
         document.getElementById('team1Sets').textContent = currentData.team1Sets || '0';
         document.getElementById('team2Sets').textContent = currentData.team2Sets || '0';
-        
-        // 점수 셀 colspan 조정
-        document.getElementById('team1ScoreCell').colSpan = 1;
-        document.getElementById('team2ScoreCell').colSpan = 1;
       }
       
       applyDesign();
@@ -275,7 +261,7 @@
       team1SetsEl.style.color = design.fontColor || '#FFFFFF';
       team1SetsEl.style.fontWeight = design.fontWeight || 'bold';
       team1SetsEl.style.fontStyle = design.fontStyle || 'normal';
-      team1SetsCell.style.backgroundColor = design.team1BgColor || '#0066CC';
+      team1SetsCell.style.backgroundColor = design.scoreBgColor || '#333333';
       
       const team2SetsCell = document.getElementById('team2SetsCell');
       const team2SetsEl = document.getElementById('team2Sets');
@@ -284,13 +270,9 @@
       team2SetsEl.style.color = design.fontColor || '#FFFFFF';
       team2SetsEl.style.fontWeight = design.fontWeight || 'bold';
       team2SetsEl.style.fontStyle = design.fontStyle || 'normal';
-      team2SetsCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      team2SetsCell.style.backgroundColor = design.scoreBgColor || '#333333';
       
-      // 더미 셀 스타일
-      const team1DummyCell = document.getElementById('team1ScoreDummyCell');
-      const team2DummyCell = document.getElementById('team2ScoreDummyCell');
-      team1DummyCell.style.backgroundColor = design.team1BgColor || '#0066CC';
-      team2DummyCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      // 더미 셀 삭제됨
       
       // 점수 셀 스타일 (일반 스코어 배경색 사용)
       const team1ScoreCell = document.getElementById('team1ScoreCell');
