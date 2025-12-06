@@ -7,16 +7,22 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: transparent; font-family: Arial, sans-serif; padding: 20px; }
-    .scoreboard { background: rgba(255, 255, 255, 0.95); border-radius: 10px; overflow: hidden; max-width: 800px; margin: 0 auto; }
-    .title { text-align: center; padding: 15px; font-weight: bold; background: #f0f0f0; font-size: 24px; border-bottom: 3px solid #000; }
-    .score-container { display: grid; grid-template-columns: 2fr 0.5fr 2fr 0.7fr; border: 3px solid #000; border-top: none; }
-    .team-section { display: flex; flex-direction: column; }
-    .team-name { text-align: center; padding: 15px; font-weight: bold; border-right: 3px solid #000; }
-    .team-scores { display: flex; border-right: 3px solid #000; border-top: 3px solid #000; }
-    .score-main { flex: 1; text-align: center; padding: 20px; font-size: 80px; font-weight: bold; line-height: 1; border-right: 3px solid #000; }
-    .score-sets { min-width: 60px; text-align: center; padding: 20px 10px; font-size: 28px; font-weight: bold; display: none; }
-    .vs-section { display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; background: #f8f8f8; border-right: 3px solid #000; }
-    .info-section { display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; background: #e8e8e8; font-size: 24px; }
+    .scoreboard { background: rgba(255, 255, 255, 0.95); border-radius: 10px; overflow: hidden; max-width: 800px; margin: 0 auto; border: 3px solid #000; }
+    .title { text-align: center; padding: 15px; font-weight: bold; background: #f0f0f0; font-size: 24px; }
+    .score-container { display: grid; grid-template-columns: 2fr 0.5fr 2fr 0.7fr; grid-template-rows: auto auto; }
+    
+    .team1-name { grid-column: 1; grid-row: 1; text-align: center; padding: 15px; font-weight: bold; border-bottom: 3px solid #000; border-right: 3px solid #000; }
+    .vs-cell { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; background: #f8f8f8; border-right: 3px solid #000; }
+    .team2-name { grid-column: 3; grid-row: 1; text-align: center; padding: 15px; font-weight: bold; border-bottom: 3px solid #000; border-right: 3px solid #000; }
+    .info-cell { grid-column: 4; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; background: #e8e8e8; font-size: 24px; }
+    
+    .team1-scores { grid-column: 1; grid-row: 2; display: flex; border-right: 3px solid #000; }
+    .team2-scores { grid-column: 3; grid-row: 2; display: flex; border-right: 3px solid #000; }
+    
+    .score-main { flex: 1; text-align: center; padding: 20px; font-size: 80px; font-weight: bold; line-height: 1; }
+    .score-sets { min-width: 60px; text-align: center; padding: 20px 10px; font-size: 28px; font-weight: bold; display: none; border-left: 3px solid #000; }
+    .team1-scores .score-main { border-right: 3px solid #000; }
+    .team2-scores .score-sets { border-right: 3px solid #000; order: -1; }
     .error-message { text-align: center; padding: 20px; color: #dc3545; font-size: 18px; background: #f8d7da; border-radius: 10px; margin: 20px; }
   </style>
 </head>
@@ -24,22 +30,18 @@
   <div class="scoreboard" id="scoreboard">
     <div class="title" id="title">족구 스코어보드</div>
     <div class="score-container">
-      <div class="team-section">
-        <div class="team-name" id="team1NameCell"><span id="team1Name">팀1</span></div>
-        <div class="team-scores">
-          <div class="score-main" id="team1ScoreCell"><span id="team1Score">0</span></div>
-          <div class="score-sets" id="team1SetsCell"><span id="team1Sets">0</span></div>
-        </div>
+      <div class="team1-name" id="team1NameCell"><span id="team1Name">팀1</span></div>
+      <div class="vs-cell" id="vsCell">VS</div>
+      <div class="team2-name" id="team2NameCell"><span id="team2Name">팀2</span></div>
+      <div class="info-cell" id="roundInfo"><span id="roundInfoText">15점제</span></div>
+      <div class="team1-scores">
+        <div class="score-main" id="team1ScoreCell"><span id="team1Score">0</span></div>
+        <div class="score-sets" id="team1SetsCell"><span id="team1Sets">0</span></div>
       </div>
-      <div class="vs-section" id="vsCell">VS</div>
-      <div class="team-section">
-        <div class="team-name" id="team2NameCell"><span id="team2Name">팀2</span></div>
-        <div class="team-scores">
-          <div class="score-sets" id="team2SetsCell"><span id="team2Sets">0</span></div>
-          <div class="score-main" id="team2ScoreCell" style="border-right:none;border-left:3px solid #000;"><span id="team2Score">0</span></div>
-        </div>
+      <div class="team2-scores">
+        <div class="score-sets" id="team2SetsCell"><span id="team2Sets">0</span></div>
+        <div class="score-main" id="team2ScoreCell"><span id="team2Score">0</span></div>
       </div>
-      <div class="info-section" id="roundInfo"><span id="roundInfoText">15점제</span></div>
     </div>
   </div>
   <script>
@@ -105,7 +107,8 @@
       const obw = (d.outerBorderWidth || '3') + 'px';
       const obc = d.outerBorderColor || '#000000';
       
-      document.querySelector('.scoreboard').style.boxShadow = `0 4px 20px rgba(0,0,0,0.3), 0 0 0 ${obw} ${obc}`;
+      document.querySelector('.scoreboard').style.borderWidth = obw;
+      document.querySelector('.scoreboard').style.borderColor = obc;
       
       const title = document.getElementById('title');
       title.style.fontSize = (d.titleFontSize || '28') + 'px';
@@ -113,12 +116,13 @@
       title.style.backgroundColor = d.titleBgColor || '#f0f0f0';
       title.style.fontWeight = d.titleFontWeight || 'bold';
       title.style.fontStyle = d.titleFontStyle || 'normal';
-      title.style.borderBottom = bw + ' solid ' + bc;
       
-      document.querySelector('.score-container').style.border = bw + ' solid ' + bc;
-      document.querySelectorAll('.team-name, .team-scores, .score-main, .vs-section').forEach(el => {
+      document.querySelectorAll('.team1-name, .team2-name, .vs-cell, .info-cell, .team1-scores, .team2-scores, .score-main, .score-sets').forEach(el => {
+        const style = window.getComputedStyle(el);
+        if (style.borderRightWidth !== '0px') el.style.borderRightWidth = bw;
+        if (style.borderBottomWidth !== '0px') el.style.borderBottomWidth = bw;
+        if (style.borderLeftWidth !== '0px') el.style.borderLeftWidth = bw;
         el.style.borderColor = bc;
-        el.style.borderWidth = bw;
       });
       
       ['team1NameCell', 'team2NameCell'].forEach((id, i) => {
