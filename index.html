@@ -75,14 +75,23 @@
       const totalSets = parseInt(currentData.totalSets) || 1;
       const currentSet = parseInt(currentData.currentSet) || 1;
       
+      const team1ScoreCell = document.getElementById('team1ScoreCell');
+      const team2ScoreCell = document.getElementById('team2ScoreCell');
+      const team1SetsCell = document.getElementById('team1SetsCell');
+      const team2SetsCell = document.getElementById('team2SetsCell');
+      
       if (totalSets === 1) {
         document.getElementById('roundInfoText').textContent = currentData.roundInfo || '15점제';
-        document.getElementById('team1SetsCell').style.display = 'none';
-        document.getElementById('team2SetsCell').style.display = 'none';
+        team1SetsCell.style.display = 'none';
+        team2SetsCell.style.display = 'none';
+        team1ScoreCell.colSpan = 2;
+        team2ScoreCell.colSpan = 2;
       } else {
         document.getElementById('roundInfoText').textContent = currentSet + '세트';
-        document.getElementById('team1SetsCell').style.display = 'table-cell';
-        document.getElementById('team2SetsCell').style.display = 'table-cell';
+        team1SetsCell.style.display = 'table-cell';
+        team2SetsCell.style.display = 'table-cell';
+        team1ScoreCell.colSpan = 1;
+        team2ScoreCell.colSpan = 1;
         document.getElementById('team1Sets').textContent = currentData.team1Sets || '0';
         document.getElementById('team2Sets').textContent = currentData.team2Sets || '0';
       }
