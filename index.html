@@ -8,13 +8,13 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: transparent; font-family: Arial, sans-serif; padding: 20px; }
     .scoreboard { background: rgba(255, 255, 255, 0.95); border-radius: 10px; overflow: hidden; max-width: 800px; margin: 0 auto; border: 3px solid #000; }
-    .title { text-align: center; padding: 15px; font-weight: bold; background: #f0f0f0; font-size: 24px; }
+    .title { text-align: center; padding: 15px; font-weight: bold; background: #f0f0f0; font-size: 24px; border-bottom: 3px solid #000; }
     .score-container { display: grid; grid-template-columns: 2fr 0.5fr 2fr 0.7fr; grid-template-rows: auto auto; }
     
     .team1-name { grid-column: 1; grid-row: 1; text-align: center; padding: 15px; font-weight: bold; border-bottom: 3px solid #000; border-right: 3px solid #000; }
-    .vs-cell { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; background: #f8f8f8; border-right: 3px solid #000; }
+    .vs-cell { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; background: #f8f8f8; border-right: 3px solid #000; border-bottom: 3px solid #000; }
     .team2-name { grid-column: 3; grid-row: 1; text-align: center; padding: 15px; font-weight: bold; border-bottom: 3px solid #000; border-right: 3px solid #000; }
-    .info-cell { grid-column: 4; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; background: #e8e8e8; font-size: 24px; }
+    .info-cell { grid-column: 4; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; background: #e8e8e8; font-size: 24px; border-bottom: 3px solid #000; }
     
     .team1-scores { grid-column: 1; grid-row: 2; display: flex; align-items: center; border-right: 3px solid #000; }
     .team2-scores { grid-column: 3; grid-row: 2; display: flex; align-items: center; border-right: 3px solid #000; }
@@ -156,6 +156,16 @@
         sets.style.fontWeight = d.fontWeight || 'bold';
         sets.style.fontStyle = d.fontStyle || 'normal';
         cell.style.backgroundColor = d.scoreBgColor || '#333333';
+        if (cell.style.display === 'flex') {
+          // 3세트일 때만 리드팀 확인
+          const team1Score = parseInt(currentData.team1Score) || 0;
+          const team2Score = parseInt(currentData.team2Score) || 0;
+          if (i === 0 && team1Score > team2Score) {
+            cell.style.backgroundColor = d.currentScoreBgColor || '#FFD700';
+          } else if (i === 1 && team2Score > team1Score) {
+            cell.style.backgroundColor = d.currentScoreBgColor || '#FFD700';
+          }
+        }
       });
       
       const team1Score = parseInt(currentData.team1Score) || 0;
