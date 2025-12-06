@@ -44,20 +44,22 @@
       text-align: center;
       padding: 15px;
       font-weight: bold;
-      width: 30%;
+      width: 25%;
     }
     
     .score-cell {
       text-align: center;
       padding: 20px;
       position: relative;
-      width: 30%;
+      width: 20%;
     }
     
-    .score-container {
-      display: inline-flex;
-      align-items: flex-end;
-      line-height: 1;
+    .sets-cell {
+      text-align: center;
+      padding: 10px;
+      width: 10%;
+      font-size: 18px;
+      font-weight: bold;
     }
     
     .team-score {
@@ -65,39 +67,21 @@
       line-height: 1;
     }
     
-    .team-sets {
-      margin-left: 8px;
-      margin-bottom: 8px;
-      opacity: 0.85;
-    }
-    
     .vs-cell {
       text-align: center;
       font-weight: bold;
-      padding: 0 20px;
+      padding: 0 15px;
       background: #f8f8f8;
-      width: 10%;
+      width: 8%;
       vertical-align: middle;
     }
     
     .round-info-cell {
       text-align: center;
-      padding: 0 20px;
+      padding: 15px;
       font-weight: bold;
       background: #e8e8e8;
-      width: 15%;
-    }
-    
-    .current-set-indicator {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      background: #FFD700;
-      color: #000;
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 14px;
-      font-weight: bold;
+      width: 12%;
     }
 
     .error-message {
@@ -120,26 +104,28 @@
         <td class="team-name-cell" id="team1NameCell">
           <div id="team1Name">팀1</div>
         </td>
+        <td class="sets-cell" id="team1SetsCell" style="display: none;">
+          <div id="team1Sets">0</div>
+        </td>
         <td class="vs-cell" rowspan="2" id="vsCell">VS</td>
+        <td class="sets-cell" id="team2SetsCell" style="display: none;">
+          <div id="team2Sets">0</div>
+        </td>
         <td class="team-name-cell" id="team2NameCell">
           <div id="team2Name">팀2</div>
         </td>
-        <td class="round-info-cell" rowspan="2" id="roundInfo">15점제</td>
+        <td class="round-info-cell" rowspan="2" id="roundInfo">
+          <div id="roundInfoText">15점제</div>
+        </td>
       </tr>
       <tr>
         <td class="score-cell" id="team1ScoreCell">
-          <div id="currentSetTeam1" class="current-set-indicator" style="display: none;">← 현재세트</div>
-          <div class="score-container">
-            <div class="team-score" id="team1Score">0</div>
-            <div class="team-sets" id="team1Sets" style="display: none;">0</div>
-          </div>
+          <div class="team-score" id="team1Score">0</div>
         </td>
+        <td class="score-cell" id="team1ScoreDummyCell" style="display: none;"></td>
+        <td class="score-cell" id="team2ScoreDummyCell" style="display: none;"></td>
         <td class="score-cell" id="team2ScoreCell">
-          <div id="currentSetTeam2" class="current-set-indicator" style="display: none;">현재세트 →</div>
-          <div class="score-container">
-            <div class="team-score" id="team2Score">0</div>
-            <div class="team-sets" id="team2Sets" style="display: none;">0</div>
-          </div>
+          <div class="team-score" id="team2Score">0</div>
         </td>
       </tr>
     </table>
@@ -147,7 +133,7 @@
 
   <script>
     // Google Apps Script 웹 앱 URL (여러분의 배포 URL로 변경하세요)
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwL0e3r-R0ErbNxnyb4JeKb1NSnkm05hahrL39Yp8iee30EQ1dwvrOx59-seulkyWN-/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyzqrWHcJI9hGorgJHa0oNARgpyXqp6bPJEm7f1EPoTxcx2lWAh5qpYeSXijuitrPyr/exec';
     
     let currentData = {};
     let currentDesign = {};
@@ -197,32 +183,44 @@
       document.getElementById('team2Name').textContent = currentData.team2Name || '팀2';
       document.getElementById('team1Score').textContent = currentData.team1Score || '0';
       document.getElementById('team2Score').textContent = currentData.team2Score || '0';
-      document.getElementById('roundInfo').textContent = currentData.roundInfo || '15점제';
       
       const totalSets = parseInt(currentData.totalSets) || 1;
+      const currentSet = parseInt(currentData.currentSet) || 1;
+      const team1Score = parseInt(currentData.team1Score) || 0;
+      const team2Score = parseInt(currentData.team2Score) || 0;
+      
+      // 라운드 정보 표시
+      if (totalSets === 1) {
+        // 단세트: 15점제 등 표시
+        document.getElementById('roundInfoText').textContent = currentData.roundInfo || '15점제';
+      } else {
+        // 3세트: 현재 세트 표시
+        document.getElementById('roundInfoText').textContent = currentSet + '세트';
+      }
       
       if (totalSets === 1) {
-        document.getElementById('team1Sets').style.display = 'none';
-        document.getElementById('team2Sets').style.display = 'none';
-        document.getElementById('currentSetTeam1').style.display = 'none';
-        document.getElementById('currentSetTeam2').style.display = 'none';
+        // 단세트: 승리 세트 셀 숨기기
+        document.getElementById('team1SetsCell').style.display = 'none';
+        document.getElementById('team2SetsCell').style.display = 'none';
+        document.getElementById('team1ScoreDummyCell').style.display = 'none';
+        document.getElementById('team2ScoreDummyCell').style.display = 'none';
+        
+        // 점수 셀 colspan 조정
+        document.getElementById('team1ScoreCell').colSpan = 1;
+        document.getElementById('team2ScoreCell').colSpan = 1;
       } else {
-        document.getElementById('team1Sets').style.display = 'inline-block';
-        document.getElementById('team2Sets').style.display = 'inline-block';
+        // 3세트: 승리 세트 셀 표시
+        document.getElementById('team1SetsCell').style.display = 'table-cell';
+        document.getElementById('team2SetsCell').style.display = 'table-cell';
+        document.getElementById('team1ScoreDummyCell').style.display = 'table-cell';
+        document.getElementById('team2ScoreDummyCell').style.display = 'table-cell';
+        
         document.getElementById('team1Sets').textContent = currentData.team1Sets || '0';
         document.getElementById('team2Sets').textContent = currentData.team2Sets || '0';
         
-        const team1Score = parseInt(currentData.team1Score) || 0;
-        const team2Score = parseInt(currentData.team2Score) || 0;
-        
-        document.getElementById('currentSetTeam1').style.display = 'none';
-        document.getElementById('currentSetTeam2').style.display = 'none';
-        
-        if (team1Score > team2Score) {
-          document.getElementById('currentSetTeam1').style.display = 'block';
-        } else if (team2Score > team1Score) {
-          document.getElementById('currentSetTeam2').style.display = 'block';
-        }
+        // 점수 셀 colspan 조정
+        document.getElementById('team1ScoreCell').colSpan = 1;
+        document.getElementById('team2ScoreCell').colSpan = 1;
       }
       
       applyDesign();
@@ -269,6 +267,31 @@
       team2Name.style.fontStyle = design.fontStyle || 'normal';
       team2NameCell.style.backgroundColor = design.team2BgColor || '#CC0000';
       
+      // 승리 세트 셀 스타일
+      const team1SetsCell = document.getElementById('team1SetsCell');
+      const team1SetsEl = document.getElementById('team1Sets');
+      team1SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
+      team1SetsEl.style.fontFamily = design.fontFamily || 'Arial';
+      team1SetsEl.style.color = design.fontColor || '#FFFFFF';
+      team1SetsEl.style.fontWeight = design.fontWeight || 'bold';
+      team1SetsEl.style.fontStyle = design.fontStyle || 'normal';
+      team1SetsCell.style.backgroundColor = design.team1BgColor || '#0066CC';
+      
+      const team2SetsCell = document.getElementById('team2SetsCell');
+      const team2SetsEl = document.getElementById('team2Sets');
+      team2SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
+      team2SetsEl.style.fontFamily = design.fontFamily || 'Arial';
+      team2SetsEl.style.color = design.fontColor || '#FFFFFF';
+      team2SetsEl.style.fontWeight = design.fontWeight || 'bold';
+      team2SetsEl.style.fontStyle = design.fontStyle || 'normal';
+      team2SetsCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      
+      // 더미 셀 스타일
+      const team1DummyCell = document.getElementById('team1ScoreDummyCell');
+      const team2DummyCell = document.getElementById('team2ScoreDummyCell');
+      team1DummyCell.style.backgroundColor = design.team1BgColor || '#0066CC';
+      team2DummyCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      
       // 점수 셀 스타일 (일반 스코어 배경색 사용)
       const team1ScoreCell = document.getElementById('team1ScoreCell');
       team1ScoreCell.style.backgroundColor = design.scoreBgColor || '#333333';
@@ -291,21 +314,6 @@
       team2ScoreEl.style.fontWeight = design.fontWeight || 'bold';
       team2ScoreEl.style.fontStyle = design.fontStyle || 'normal';
       
-      // 세트 점수 스타일
-      const team1SetsEl = document.getElementById('team1Sets');
-      team1SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
-      team1SetsEl.style.fontFamily = design.fontFamily || 'Arial';
-      team1SetsEl.style.color = design.fontColor || '#FFFFFF';
-      team1SetsEl.style.fontWeight = design.fontWeight || 'bold';
-      team1SetsEl.style.fontStyle = design.fontStyle || 'normal';
-      
-      const team2SetsEl = document.getElementById('team2Sets');
-      team2SetsEl.style.fontSize = (design.setScoreFontSize || '28') + 'px';
-      team2SetsEl.style.fontFamily = design.fontFamily || 'Arial';
-      team2SetsEl.style.color = design.fontColor || '#FFFFFF';
-      team2SetsEl.style.fontWeight = design.fontWeight || 'bold';
-      team2SetsEl.style.fontStyle = design.fontStyle || 'normal';
-      
       // 현재 리드팀 배경색 변경
       const team1Score = parseInt(currentData.team1Score) || 0;
       const team2Score = parseInt(currentData.team2Score) || 0;
@@ -326,8 +334,9 @@
       
       // 라운드 정보 스타일
       const roundInfoEl = document.getElementById('roundInfo');
-      roundInfoEl.style.fontSize = (design.setInfoFontSize || '24') + 'px';
-      roundInfoEl.style.color = design.setInfoColor || '#000000';
+      const roundInfoText = document.getElementById('roundInfoText');
+      roundInfoText.style.fontSize = (design.setInfoFontSize || '24') + 'px';
+      roundInfoText.style.color = design.setInfoColor || '#000000';
     }
     
     // 초기 로드
