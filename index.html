@@ -260,12 +260,12 @@
       team2Name.style.color = design.fontColor || '#FFFFFF';
       team2NameCell.style.backgroundColor = design.team2BgColor || '#CC0000';
       
-      // 점수 셀 스타일
+      // 점수 셀 스타일 (일반 스코어 배경색 사용)
       const team1ScoreCell = document.getElementById('team1ScoreCell');
-      team1ScoreCell.style.backgroundColor = design.team1BgColor || '#0066CC';
+      team1ScoreCell.style.backgroundColor = design.scoreBgColor || '#333333';
       
       const team2ScoreCell = document.getElementById('team2ScoreCell');
-      team2ScoreCell.style.backgroundColor = design.team2BgColor || '#CC0000';
+      team2ScoreCell.style.backgroundColor = design.scoreBgColor || '#333333';
       
       // 점수 텍스트 스타일
       const team1ScoreEl = document.getElementById('team1Score');
